@@ -34,7 +34,64 @@ async function basicDownload(req,res) {
     })
 };
 
+function getInfoSync(req,res) {
+    const output = execSync(`yt-dlp ${link} -J`).toString()
+    const formats = JSON.parse(output).formats
+    const acceptableExt = ['mp3', 'mp4', 'webm']
+    const acceptableSizes = ['144p', '240p', '360p', '480p', '720p', '1080p']
+    const availableQuality = {
+        '144p':false,
+        '240p':false,
+        '360p':false,
+        '480p':false,
+        '720p':false,
+        '1080p':false,
+
+    }
+    const acceptableFormats = []
+    for(format in formats) {
+        const ext = formats[format].ext
+        const size = formats[format].format_note
+        if(acceptableExt.includes(ext) && acceptableSizes.includes(size)){
+            acceptableFormats.push(formats[format])
+            if(availableQuality[size] == false) availableQuality[size] = true
+        }
+    }
+    acceptableFormats.push({availableQuality})
+    return acceptableFormats;
+}
+
+function getInfo(req,res,data) {
+    const formats = JSON.parse(data).formats
+    const acceptableExt = ['mp3', 'mp4', 'webm']
+    const acceptableSizes = ['144p', '240p', '360p', '480p', '720p', '1080p']
+    const availableQuality = {
+        '144p':false,
+        '240p':false,
+        '360p':false,
+        '480p':false,
+        '720p':false,
+        '1080p':false,
+
+    }
+    const acceptableFormats = []
+    for(format in formats) {
+        const ext = formats[format].ext
+        const size = formats[format].format_note
+        if(acceptableExt.includes(ext) && acceptableSizes.includes(size)){
+            acceptableFormats.push(formats[format])
+            if(availableQuality[size] == false) availableQuality[size] = true
+        }
+    }
+    acceptableFormats.push({availableQuality})
+    return acceptableFormats;
+}
+
+
+
 
 module.exports = {
     basicDownload,
+    getInfoSync,
+    getInfo,
 }
